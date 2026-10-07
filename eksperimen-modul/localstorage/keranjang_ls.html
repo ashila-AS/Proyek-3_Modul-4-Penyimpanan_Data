@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Keranjang (Local Storage)</title>
+</head>
+<body>
+    <h1>Daftar Produk</h1>
+    <ul id="daftarProduk"></ul>
+
+    <h2>Keranjang Anda</h2>
+    <ul id="isiKeranjang"></ul>
+    <p><strong id="total"></strong></p>
+    <button id="btnKosongkan">Kosongkan keranjang</button>
+
+    <script>
+        const produk = [
+            { id: 1, nama: 'Buku Tulis', harga: 5000 },
+            { id: 2, nama: 'Pulpen', harga: 3000 },
+            { id: 3, nama: 'Penggaris', harga: 4000 }
+        ];
+
+        const KUNCI = 'keranjang';
+
+        function bacaKeranjang() {
+            try {
+                return JSON.parse(localStorage.getItem(KUNCI)) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function simpanKeranjang(data) {
+            localStorage.setItem(KUNCI, JSON.stringify(data));
+        }
+
+        function rupiah(angka) {
+            return 'Rp ' + angka.toLocaleString('id-ID');
+        }
+
+        function tambah(id) {
+            const keranjang = bacaKeranjang();
+            const item = keranjang.find(function (i) { return i.id === id; });
+            if (item) {
+                item.jumlah++;
+            } else {
+                keranjang.push({ id: id, jumlah: 1 });
+            }
+            simpanKeranjang(keranjang);
+            tampilkanKeranjang();
+        }
+
+        function tampilkanProduk() {
+            const ul = document.getElementById('daftarProduk');
+            produk.forEach(function (p) {
+                const li = document.createElement('li');
+                li.textContent = p.nama + ' - ' + rupiah(p.harga) + ' ';
+                const btn = document.createElement('button');
+                btn.textContent = 'Tambah';
+                btn.addEventListener('click', function () { tambah(p.id); });
+                li.appendChild(btn);
+                ul.appendChild(li);
+            });
+        }
+
+        function tampilkanKeranjang() {
+            const ul = document.getElementById('isiKeranjang');
+            ul.innerHTML = '';
+            let total = 0;
+            const keranjang = bacaKeranjang();
+
+            if (keranjang.length === 0) {
+                ul.innerHTML = '<li>Keranjang kosong.</li>';
+            }
+
+            keranjang.forEach(function (item) {
+                const p = produk.find(function (x) { return x.id === item.id; });
+                if (!p) return;
+                const sub = p.harga * item.jumlah;
+                total += sub;
+                const li = document.createElement('li');
+                li.textContent = p.nama + ' x ' + item.jumlah + ' = ' + rupiah(sub);
+                ul.appendChild(li);
+            });
+
+            document.getElementById('total').textContent = 'Total: ' + rupiah(total);
+        }
+
+        document.getElementById('btnKosongkan').addEventListener('click', function () {
+            localStorage.removeItem(KUNCI);
+            tampilkanKeranjang();
+        });
+
+        tampilkanProduk();
+        tampilkanKeranjang();
+    </script>
+</body>
+</html>

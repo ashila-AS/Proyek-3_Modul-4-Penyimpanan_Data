@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Tema dengan Local Storage</title>
+    <style>
+        body { font-family: sans-serif; padding: 2rem; }
+        body.gelap { background: #1e1e1e; color: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>Pengaturan Tema</h1>
+    <p>Pilihan tema Anda tetap tersimpan setelah halaman di-refresh atau browser ditutup.</p>
+    <button id="btnTema">Ganti Tema</button>
+
+    <script>
+        const KUNCI = 'tema';
+
+        function terapkanTema(tema) {
+            document.body.classList.toggle('gelap', tema === 'gelap');
+        }
+
+        terapkanTema(localStorage.getItem(KUNCI) || 'terang');
+
+        document.getElementById('btnTema').addEventListener('click', function () {
+            const baru = document.body.classList.contains('gelap') ? 'terang' : 'gelap';
+            localStorage.setItem(KUNCI, baru);
+            terapkanTema(baru);
+        });
+    </script>
+</body>
+</html>
